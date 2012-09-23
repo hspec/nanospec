@@ -32,10 +32,20 @@ spec = do
     it "exits with exitFailure if not all examples pass" $ do
       H.hspec failingSpec `shouldThrow` (== ExitFailure 1)
 
-    it "prints the number of total and failed examples" $ do
-      let action = H.hspec failingSpec `E.catch` \e -> (let tyes = e :: ExitCode in return ())
+    it "prints a report of the test run" $ do
+      let action = H.hspec failingSpec `E.catch` \e -> (return (e :: ExitCode) >> return ())
       (r, ()) <- capture action
-      (last . lines) r `shouldBe` "5 example(s), 3 failure(s)"
+      lines r `shouldBe` [
+          "/foo/foo 1/ OK"
+        , "/foo/foo 2/ FAILED"
+        , "failure"
+        , "/foo/bar/bar 1/ FAILED"
+        , "failure"
+        , "/foo/bar/bar 2/ OK"
+        , "/baz/baz 1/ FAILED"
+        , "failure"
+        , "5 example(s), 3 failure(s)"
+        ]
 
   describe "evaluateExpectation" $ do
     it "returns Success if expectation holds" $ do

@@ -23,6 +23,8 @@ library
 test-suite spec
   type:
       exitcode-stdio-1.0
+  ghc-options:
+      -Wall -Werror
   hs-source-dirs:
       src, test
   main-is:

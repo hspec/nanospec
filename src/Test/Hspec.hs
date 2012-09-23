@@ -5,6 +5,7 @@ module Test.Hspec where
 import           Control.Applicative
 import           Control.Monad
 import           Data.Monoid
+import           Data.List (intercalate)
 import           Data.Typeable
 import qualified Control.Exception as E
 import           System.Exit
@@ -48,20 +49,26 @@ instance Monoid Summary where
   (Summary x1 x2) `mappend` (Summary y1 y2) = Summary (x1 + y1) (x2 + y2)
 
 runSpec :: Spec -> IO Summary
-runSpec = runForrest
+runSpec = runForrest []
   where
-    runForrest :: Spec -> IO Summary
-    runForrest (SpecM () xs) = mconcat <$> mapM runTree xs
+    runForrest :: [String] -> Spec -> IO Summary
+    runForrest labels (SpecM () xs) = mconcat <$> mapM (runTree labels) xs
 
-    runTree :: SpecTree -> IO Summary
-    runTree spec = case spec of
-      SpecExample s x -> do
+    runTree :: [String] -> SpecTree -> IO Summary
+    runTree labels spec = case spec of
+      SpecExample label x -> do
+        putStr $ "/" ++ (intercalate "/" . reverse) (label:labels) ++ "/ "
         r <- x
         case r of
-          Success   -> return (Summary 1 0)
-          Failure _ -> return (Summary 1 1)
-      SpecGroup s xs  -> do
-        runForrest xs
+          Success   -> do
+            putStrLn "OK"
+            return (Summary 1 0)
+          Failure err -> do
+            putStrLn "FAILED"
+            putStrLn err
+            return (Summary 1 1)
+      SpecGroup label xs  -> do
+        runForrest (label:labels) xs
 
 hspec :: Spec -> IO ()
 hspec spec = do
