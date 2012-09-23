@@ -5,8 +5,16 @@ license-file:     LICENSE
 copyright:        (c) 2012 Simon Hengel
 author:           Simon Hengel <sol@typeful.net>
 maintainer:       Simon Hengel <sol@typeful.net>
+category:         Testing
+synopsis:         A lightweight implementation of a subset of Hspec's API
+description:      A lightweight implementation of a subset of Hspec's API with
+                  minimal dependencies.
 build-type:       Simple
 cabal-version:    >= 1.8
+
+source-repository head
+  type: git
+  location: https://github.com/hspec/nanospec
 
 library
   exposed:
@@ -18,7 +26,7 @@ library
   exposed-modules:
       Test.Hspec
   build-depends:
-      base
+      base >= 4 && <= 5
 
 test-suite spec
   type:
