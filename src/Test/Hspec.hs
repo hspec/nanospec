@@ -2,29 +2,40 @@
 -- | A lightweight implementation of Hspec's API.
 module Test.Hspec where
 
+import           Control.Applicative
 import           Control.Monad
 import           Data.Monoid
 import           Data.Typeable
 import qualified Control.Exception as E
-import           Control.Monad.Trans.Writer
 import           System.Exit
 
-data SpecTree = SpecGroup String [SpecTree]
+-- a writer monad
+data SpecM a = SpecM a [SpecTree]
+
+add :: SpecTree -> SpecM ()
+add s = SpecM () [s]
+
+instance Monad SpecM where
+  return a             = SpecM a []
+  SpecM a xs >>= f = case f a of
+    SpecM b ys -> SpecM b (xs ++ ys)
+
+data SpecTree = SpecGroup String Spec
               | SpecExample String (IO Result)
 
 data Result = Success | Failure String
   deriving (Eq, Show)
 
-type Spec = Writer [SpecTree] ()
+type Spec = SpecM ()
 
 describe :: String -> Spec -> Spec
-describe label = tell . return . SpecGroup label . execWriter
+describe label = add . SpecGroup label
 
 context :: String -> Spec -> Spec
 context = describe
 
 it :: String -> Expectation -> Spec
-it label = tell . return . SpecExample label . evaluateExpectation
+it label = add . SpecExample label . evaluateExpectation
 
 -- | Summary of a test run.
 data Summary = Summary {
@@ -37,10 +48,10 @@ instance Monoid Summary where
   (Summary x1 x2) `mappend` (Summary y1 y2) = Summary (x1 + y1) (x2 + y2)
 
 runSpec :: Spec -> IO Summary
-runSpec = runForrest . execWriter
+runSpec = runForrest
   where
-    runForrest :: [SpecTree] -> IO Summary
-    runForrest = fmap mconcat . mapM runTree
+    runForrest :: Spec -> IO Summary
+    runForrest (SpecM () xs) = mconcat <$> mapM runTree xs
 
     runTree :: SpecTree -> IO Summary
     runTree spec = case spec of
