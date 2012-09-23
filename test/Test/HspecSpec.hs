@@ -3,6 +3,7 @@ module Main (main) where
 
 import "hspec"   Test.Hspec
 
+import           Control.Applicative
 import qualified Test.Hspec as H
 import qualified Control.Exception as E
 import           System.Exit
@@ -25,6 +26,12 @@ failingSpec = do
     success = H.expect "success" True
     failure = H.expect "failure" False
 
+runSpec :: H.Spec -> IO [String]
+runSpec s = lines . fst <$> capture (H.hspec s `E.catch` ignore)
+  where
+    ignore :: ExitCode -> IO ()
+    ignore _ = return ()
+
 spec :: Spec
 spec = do
 
@@ -33,9 +40,7 @@ spec = do
       H.hspec failingSpec `shouldThrow` (== ExitFailure 1)
 
     it "prints a report of the test run" $ do
-      let action = H.hspec failingSpec `E.catch` \e -> (return (e :: ExitCode) >> return ())
-      (r, ()) <- capture action
-      lines r `shouldBe` [
+      runSpec failingSpec `shouldReturn` [
           "/foo/foo 1/ OK"
         , "/foo/foo 2/ FAILED"
         , "failure"

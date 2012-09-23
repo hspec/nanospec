@@ -1,6 +1,30 @@
-{-# LANGUAGE DeriveDataTypeable #-}
--- | A lightweight implementation of Hspec's API.
-module Test.Hspec where
+{-# LANGUAGE DeriveDataTypeable, CPP #-}
+-- | A lightweight implementation of a subset of Hspec's API.
+module Test.Hspec (
+-- * Types
+  SpecM
+, Spec
+
+-- * Defining a spec
+, describe
+, context
+, it
+
+-- ** Setting expectations
+, Expectation
+, expect
+, shouldBe
+, shouldReturn
+
+-- * Running a spec
+, hspec
+
+#ifdef TEST
+-- * Internal stuff
+, evaluateExpectation
+, Result (..)
+#endif
+) where
 
 import           Control.Applicative
 import           Control.Monad
@@ -39,10 +63,7 @@ it :: String -> Expectation -> Spec
 it label = add . SpecExample label . evaluateExpectation
 
 -- | Summary of a test run.
-data Summary = Summary {
-  summaryExamples :: Int
-, summaryFailures :: Int
-} deriving (Eq, Show)
+data Summary = Summary Int Int
 
 instance Monoid Summary where
   mempty = Summary 0 0
