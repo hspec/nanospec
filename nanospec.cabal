@@ -31,6 +31,8 @@ library
 test-suite spec
   type:
       exitcode-stdio-1.0
+  cpp-options:
+      -DTEST
   ghc-options:
       -Wall -Werror
   hs-source-dirs:
