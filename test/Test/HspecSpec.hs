@@ -27,7 +27,7 @@ failingSpec = do
     failure = H.expect "failure" False
 
 runSpec :: H.Spec -> IO [String]
-runSpec s = lines . fst <$> capture (H.hspec s `E.catch` ignore)
+runSpec s = lines <$> capture_ (H.hspec s `E.catch` ignore)
   where
     ignore :: ExitCode -> IO ()
     ignore _ = return ()

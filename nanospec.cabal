@@ -42,4 +42,4 @@ test-suite spec
   build-depends:
       base
     , hspec >= 1.3
-    , silently
+    , silently >= 1.2.4
