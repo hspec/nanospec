@@ -40,8 +40,15 @@ data SpecM a = SpecM a [SpecTree]
 add :: SpecTree -> SpecM ()
 add s = SpecM () [s]
 
+instance Functor SpecM where
+  fmap = undefined
+
+instance Applicative SpecM where
+  pure a = SpecM a []
+  (<*>) = ap
+
 instance Monad SpecM where
-  return a             = SpecM a []
+  return = pure
   SpecM a xs >>= f = case f a of
     SpecM b ys -> SpecM b (xs ++ ys)
 
