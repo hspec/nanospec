@@ -1,9 +1,12 @@
-{-# LANGUAGE PackageImports #-}
+{-# LANGUAGE PackageImports, CPP #-}
 module Main (main) where
 
 import "hspec"   Test.Hspec
 
+#if !(MIN_VERSION_base(4,8,0))
 import           Control.Applicative
+#endif
+
 import qualified Test.Hspec as H
 import qualified Control.Exception as E
 import           System.Exit

@@ -34,7 +34,7 @@ test-suite spec
   cpp-options:
       -DTEST
   ghc-options:
-      -Wall -Werror
+      -Wall
   hs-source-dirs:
       src, test
   main-is:

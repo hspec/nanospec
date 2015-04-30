@@ -26,9 +26,12 @@ module Test.Hspec (
 #endif
 ) where
 
+#if !(MIN_VERSION_base(4,8,0))
 import           Control.Applicative
-import           Control.Monad
 import           Data.Monoid
+#endif
+
+import           Control.Monad
 import           Data.List (intercalate)
 import           Data.Typeable
 import qualified Control.Exception as E
