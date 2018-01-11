@@ -30,9 +30,6 @@ module Test.Hspec (
 import           Control.Applicative
 import           Data.Monoid
 #endif
-#if MIN_VERSION_base(4,9,0)
-import           Data.Semigroup
-#endif
 
 import           Control.Monad
 import           Data.List (intercalate)
@@ -78,17 +75,13 @@ it label = add . SpecExample label . evaluateExpectation
 -- | Summary of a test run.
 data Summary = Summary Int Int
 
-#if MIN_VERSION_base(4,9,0)
-instance Semigroup Summary where
-  (Summary x1 x2) <> (Summary y1 y2) = Summary (x1 + y1) (x2 + y2)
-#endif  
-
 instance Monoid Summary where
   mempty = Summary 0 0
-#if MIN_VERSION_base(4,9,0)
-  mappend = (<>)
-#else
+#if !MIN_VERSION_base(4,11,0)
   (Summary x1 x2) `mappend` (Summary y1 y2) = Summary (x1 + y1) (x2 + y2)
+#else
+instance Semigroup Summary where
+  (Summary x1 x2) <> (Summary y1 y2) = Summary (x1 + y1) (x2 + y2)
 #endif
 
 runSpec :: Spec -> IO Summary
