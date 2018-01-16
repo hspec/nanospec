@@ -1,0 +1,46 @@
+ghc:
+- 7.0.1
+- 7.0.2
+- 7.0.3
+- 7.0.4
+
+- 7.2.2
+
+- 7.4.1
+- 7.4.2
+
+- 7.6.1
+- 7.6.2
+- 7.6.3
+
+- 7.8.1
+- 7.8.2
+- 7.8.3
+- 7.8.4
+
+- 7.10.1
+- 7.10.2
+- 7.10.3
+
+- 8.0.1
+- 8.0.2
+
+- 8.2.1
+- 8.2.2
+
+travis:
+  before_install:
+  - export PATH=/opt/ghc/$GHC_VERSION/bin:/opt/cabal/$CABAL_VERSION/bin:$HOME/.cabal/bin:$PATH
+
+  install:
+  - cabal --version
+  - ghc --version
+  - travis_retry cabal update
+  - grep jobs ${HOME}/.cabal/config
+  - "sed -i 's/^jobs:.*/jobs: 2/' ${HOME}/.cabal/config"
+  - grep jobs ${HOME}/.cabal/config
+  - cabal install --only-dependencies --enable-tests --enable-benchmarks
+
+  script:
+  # - cabal configure --enable-tests --ghc-options=-Werror && cabal build && cabal test --show-details=direct
+  - cabal configure --enable-tests --ghc-options=-Werror && cabal build && cabal test --show-details=always
