@@ -1,1 +1,0 @@
-:set -isrc -itest -DTEST -optP-includedist/build/autogen/cabal_macros.h
